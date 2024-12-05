@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model device {
+  id            Int              @id @unique(map: "id") @default(autoincrement())
+  sn            String           @unique @db.VarChar(20)
+  created_at    DateTime         @default(dbgenerated("(now())")) @db.Timestamp(0)
+  device_info   device_info?
+  device_status device_status?
+  fields        field_relation[]
+  logs          file[]
+  log_config    log_config?
+}
+
+model device_info {
+  device_id     Int      @id @unique(map: "device_id") @default(0)
+  user          String?  @db.VarChar(20)
+  mobile        String?  @db.VarChar(20)
+  merchant_name String?  @db.VarChar(50)
+  created_at    DateTime @default(now()) @db.Timestamp(0)
+  updated_at    DateTime @default(now()) @db.Timestamp(0)
+  device        device   @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_device_info_device")
+}
+
+model device_status {
+  device_id            Int       @id @unique(map: "device_id")
+  status               Int       @default(0) @db.TinyInt
+  last_login_time      DateTime? @db.Timestamp(0)
+  last_offline_time    DateTime? @db.Timestamp(0)
+  last_log_upload_time DateTime? @db.Timestamp(0)
+  last_log_remove_time DateTime? @db.Timestamp(0)
+  device               device    @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK__device")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model file {
+  id           Int      @id @default(autoincrement())
+  device_id    Int      @default(0)
+  path         String   @db.VarChar(255)
+  mimetype     String?  @db.VarChar(100)
+  filename     String?  @db.VarChar(100)
+  originalname String?  @db.VarChar(255)
+  size         Int?     @default(0)
+  destination  String?  @db.VarChar(500)
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  type         String   @default("other") @db.VarChar(10)
+  device       device   @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_log_device")
+
+  @@index([device_id], map: "FK_file_device")
+}
+
+model log_config {
+  device_id      Int      @id @unique(map: "device_id") @default(0)
+  log_saved_days Int?     @default(7) @db.TinyInt
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+  updated_at     DateTime @default(now()) @db.Timestamp(0)
+  device         device   @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_log_config_device")
+}
+
+model field {
+  id         Int              @id @unique(map: "id") @default(autoincrement())
+  name       String           @db.VarChar(20)
+  type       String           @default("user") @db.VarChar(10)
+  created_at DateTime         @default(now()) @db.Timestamp(0)
+  updated_at DateTime         @default(now()) @db.Timestamp(0)
+  fields     field_relation[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model field_relation {
+  id        Int     @id @default(autoincrement())
+  device_id Int?
+  field_id  Int?
+  device    device? @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK__field_relation_device")
+  field     field?  @relation(fields: [field_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK__field_relation_field")
+
+  @@index([device_id], map: "FK__field_relation_device")
+  @@index([field_id], map: "FK__field_relation_field")
+}

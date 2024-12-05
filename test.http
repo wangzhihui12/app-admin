@@ -1,0 +1,71 @@
+# http://localhost:3000/device?user=尹
+http://localhost:3000/device/addAll
+
+# http://localhost:3000/device/task
+
+#  POST http://localhost:3000/device/add HTTP/1.1
+#  content-type: application/json
+
+#  {
+#      "sn":"test2002"
+#  }
+
+# POST http://localhost:3000/device/addInfo HTTP/1.1
+# content-type: application/json
+
+# {
+#     "device_id":1000001,
+#     "mobile":"13335327367",
+#     "user":"郝小美",
+#     "merchant_name":"D+陕西榆林华睿通园区店(44211168)"
+# }
+
+# POST http://localhost:3000/device/updateInfo HTTP/1.1
+# content-type: application/json
+
+# {
+#      "device_id":1000002,
+#     "mobile":"13335327367",
+#     "user":"郝小美",
+#     "merchant_name":"D+陕西榆林华睿通园区店(44211168)"
+# }
+
+# http://localhost:3000/sse/event
+
+
+
+# POST http://localhost:3000/broadcast/cmd HTTP/1.1
+#  content-type: application/json
+
+#  {
+#       "event":"private",
+#       "device_id":"1000068",
+#         "data":{
+#             "command":"getLog",
+#             "days":20,
+#             "interval":1000,
+#             "force":true
+#         }
+#  }
+
+# http://localhost:3000/file/list?device_id=1000000
+#  http://localhost:3000/config?device_id=1000000
+# http://localhost:3000/file/delete?id=50
+# POST http://localhost:3000/config/add HTTP/1.1
+# content-type: application/json
+
+# {
+#     "device_id":1000002,
+#     "log_saved_days":7,
+#     "user_fields":[1,2,3]
+# }
+
+# POST http://localhost:3000/fields/user/add HTTP/1.1
+# content-type: application/json
+
+# {
+#     "name":"userType",
+#     "type":"user"
+# }
+
+# http://localhost:3000/fields/user/list?name=name
